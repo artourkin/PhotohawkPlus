@@ -19,9 +19,9 @@ import dao.*;
  * Created by artur on 20/09/15.
  */
 public class CSVReader {
-    private static CellProcessor[] getProcessors() {
+    private static CellProcessor[] getReadingProcessors() {
 
-        final CellProcessor[] processors = new CellProcessor[] {
+        return new CellProcessor[] {
                 new ParseDouble(), // SSIM
                 new ParseBool(), // isSimilar
                 new NotNull(), // Original
@@ -30,8 +30,6 @@ public class CSVReader {
                 new NotNull() // Result_PNG
 
         };
-
-        return processors;
     }
 
 
@@ -44,7 +42,7 @@ public class CSVReader {
 
             // the header elements are used to map the values to the bean (names must match)
             final String[] header = beanReader.getHeader(true);
-            final CellProcessor[] processors = getProcessors();
+            final CellProcessor[] processors = getReadingProcessors();
 
             ImageBean image;
             while( (image = beanReader.read(ImageBean.class, header, processors)) != null ) {

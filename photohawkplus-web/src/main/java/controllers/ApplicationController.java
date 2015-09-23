@@ -37,95 +37,12 @@ import java.util.List;
 
 @Singleton
 public class ApplicationController {
-    @Inject
-    NinjaProperties ninjaProperties;
-    public Result index(Context ctx) {
 
-        if (ctx.getParameter("isSimilar")!=null) {
-            String original = ctx.getSession().get("original");
-            String result = ctx.getSession().get("result");
-            String isSimilar = ctx.getParameter("isSimilar");
+    public Result index() {
 
-
-            saveResults(original, isSimilar);
-        }
-
-        ImageBean next=getNextImage();
-
-
-        String original_resized = ImageOps.downscale(next.getOriginal_PNG());
-        String result_resized = ImageOps.downscale(next.getResult_PNG());
-
-        Result result=Results.html();
-        result.render("original",imageToAssets(next.getOriginal_PNG()));
-        result.render("original_resized",imageToAssets(original_resized));
-        result.render("result",imageToAssets(next.getResult_PNG()));
-        result.render("result_resized",imageToAssets(result_resized));
-        return result;
-    }
-    List<ImageBean> result_images;
-
-    String imageToAssets(String input){
-        File file=new File(input);
-        File copyTo=null;
-        if (file.exists()){
-            String filename=file.getName();
-
-            try {
-                copyTo=new File("src/main/java/assets/images/"+filename);
-                FileUtils.copyFile(file,copyTo);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-        if (copyTo!=null) {
-            String path = copyTo.getPath();
-            if (path.startsWith("src/main/java")) {
-                path=path.replace("src/main/java", "");
-
-            }
-            return path;
-        }
-        return input;
-
+        return Results.html();
     }
 
-    private void saveResults(String original, String isSimilar) {
-        ImageBean image=input_images.get(0);
-        image.setIsSimilar(Boolean.parseBoolean(isSimilar));
-        result_images.add(image);
-    }
-
-    List<ImageBean> input_images;
-    private ImageBean getNextImage() {
-        ImageBean result=null;
-        if (input_images==null){
-            try {
-                input_images= CSVReader.readWithCsvBeanReader("src/test/java/resources/images.csv");
-            } catch (Exception e) {
-                e.printStackTrace();
-
-            }
-        }
-        if (input_images!=null && input_images.size()>0)
-            result= input_images.remove(0);
-        return  result;
-    }
-
-    public Result helloWorldJson() {
-        
-        SimplePojo simplePojo = new SimplePojo();
-        simplePojo.content = "Hello <b>World!</b> Hello Json!";
 
 
-        return Results.json().render(simplePojo);
-
-    }
-    
-    public static class SimplePojo {
-
-        public String content;
-        
-    }
 }

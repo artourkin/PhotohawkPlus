@@ -5,7 +5,12 @@ import at.ac.tuwien.photohawk.evaluation.colorconverter.StaticColor;
 import at.ac.tuwien.photohawk.evaluation.operation.TransientOperation;
 import at.ac.tuwien.photohawk.evaluation.qa.SsimQa;
 import dao.ImageBean;
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utils.CSVWriter;
+import utils.FolderHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,6 +26,7 @@ public class photohawkplusCmd {
     SsimQa ssimQa;
     ImageReader ir;
     File originals_folder,results_folder, tmp_results_folder;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     Path tif_folder;
     CSVWriter csvWriter;
     List<ImageBean> imageBeans;
@@ -44,6 +50,7 @@ public class photohawkplusCmd {
     }
 
     private void init() {
+        logger.debug("Initialising SSIM calculator...");
         ir = new ImageReader("dcraw.ssim");
         imageBeans=new ArrayList<>();
         ssimQa = new SsimQa();
@@ -55,39 +62,78 @@ public class photohawkplusCmd {
             e.printStackTrace();
         }
         csvWriter=new CSVWriter(new File(tmp_results_folder.toString()+File.separator+"images.csv"));
+        System.out.println("Initialization done.");
 
     }
-    public void run() {
+    public Double calculateSSIM(String fileString1, String fileString2, String fileString1_png, String fileString2_png) throws IOException {
+        System.out.println("Calculating metrics for " + fileString1+ " and " + fileString2);
+        File file1 = new File(fileString1);
+        File file2 = new File(fileString2);
+        BufferedImage bImage1 = getBufferedImage(file1);
+        BufferedImage bImage2 = getBufferedImage(file2);
+        double SSIM=ssimQa.evaluate(bImage1, bImage2).getResult().getChannelValue(0);
+        saveImage(bImage1,fileString1_png);
+        saveImage(bImage2,fileString2_png);
+        return SSIM;
+    }
+    public Double calculateSSIM(String fileString1, String fileString2) throws IOException {
+        System.out.println("Calculating metrics for " + fileString1+ " and " + fileString2);
+        File file1 = new File(fileString1);
+        File file2 = new File(fileString2);
+        BufferedImage bImage1 = getBufferedImage(file1);
+        BufferedImage bImage2 = getBufferedImage(file2);
+        double SSIM=ssimQa.evaluate(bImage1, bImage2).getResult().getChannelValue(0);
+        String saveTo1=FolderHelper.getTempPath()+File.separator+file1.getName().toString()+".png";
+        String saveTo2=FolderHelper.getTempPath()+File.separator+file2.getName().toString()+".png";
+        saveImage(bImage1, saveTo1);
+        saveImage(bImage2,saveTo2);
+        return SSIM;
+    }
+
+
+
+
+    public List<ImageBean> run() {
+        List<ImageBean> result=new ArrayList<>();
         List<Path> originals=listFiles(originals_folder.toPath());
         List<Path> results=listFiles(results_folder.toPath());
-        for (Path original: originals){
-            String original_base=getBaseFilename(original.getFileName().toString());
-            for (Path result: results){
-                String result_base=getBaseFilename(result.getFileName().toString());
+        for (Path original_path: originals){
+            String original_base=getBaseFilename(original_path.getFileName().toString());
+            for (Path result_path: results){
+                String result_base=getBaseFilename(result_path.getFileName().toString());
                 if (!original_base.isEmpty() && original_base.equals(result_base)){
                     try {
-                        BufferedImage bImage1 = getBufferedImage(original.toFile());
-                        BufferedImage bImage2 = getBufferedImage(result.toFile());
+                        System.out.println("Calculating metrics for " + original_path.getFileName());
+                        BufferedImage bImage1 = getBufferedImage(original_path.toFile());
+                        BufferedImage bImage2 = getBufferedImage(result_path.toFile());
                         double SSIM=ssimQa.evaluate(bImage1, bImage2).getResult().getChannelValue(0);
-                        String original_PNG=saveImage(original, bImage1);
-                        String result_PNG=saveImage(result, bImage2);
+                        String original_PNG=saveImage(original_path, bImage1);
+                        String result_PNG=saveImage(result_path, bImage2);
                         bImage1.flush();
                         bImage2.flush();
-                        ImageBean imageBean=new ImageBean(SSIM, true,original.toString(),result.toString(),original_PNG, result_PNG);
+                        ImageBean imageBean=new ImageBean(SSIM, true,original_path.toString(),result_path.toString(),original_PNG, result_PNG);
+                        result.add(imageBean);
                         csvWriter.write(imageBean);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-
                 }
 
             }
+
         }
     csvWriter.destroy();
+
+        return result;
     }
     private String saveImage(Path original, BufferedImage bImage1) throws IOException {
         File file=new File(tif_folder.toString() + File.separator + original.getFileName().toString()+".png");
+        ImageIO.write(bImage1, "png", file);
+        return file.getAbsolutePath();
+    }
+
+    private String saveImage(BufferedImage bImage1, String pathToSave) throws IOException {
+        File file=new File(pathToSave);
         ImageIO.write(bImage1, "png", file);
         return file.getAbsolutePath();
     }
@@ -117,31 +163,6 @@ public class photohawkplusCmd {
 
     }
 
-    private double evaluate(File left, File right){
-        String e = null;
-        Float result=null;
-        try {
-            e = this.ir.determineReadMode(left, "dcraw");
-            String rightMode = this.ir.determineReadMode(right, "dcraw");
-            BufferedImage leftImg = this.ir.readImage(left, e, rightMode);
-            BufferedImage rightImg = this.ir.readImage(right, rightMode, e);
 
-
-
-            TransientOperation<Float, StaticColor> op = this.ssimQa.evaluate(leftImg, rightImg);
-            result = op.getResult().getChannelValue(0);
-            File leftImg_png=new File(left.getName()+".png");
-            File rightImg_png=new File(right.getName()+".png");
-            ImageIO.write(leftImg, "png", leftImg_png);
-            ImageIO.write(rightImg, "png", rightImg_png);
-
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        if (result !=null)
-            return result.doubleValue();
-        return -1;
-
-    }
 
 }

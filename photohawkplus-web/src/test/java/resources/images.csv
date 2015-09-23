@@ -1,4 +1,0 @@
-SSIM,isSimilar,Original,Result,Original_PNG,Result_PNG
-0.9645079970359802,true,/Users/artur/Shared/originals/RAW_NIKON_D1.NEF,/Users/artur/Shared/results/RAW_NIKON_D1.dng,src/test/java/resources/temp_images/RAW_NIKON_D1.NEF.png,src/test/java/resources/temp_images/RAW_NIKON_D1.dng.png
-1.0,true,/Users/artur/Shared/originals/RAW_NIKON_D1X.NEF,/Users/artur/Shared/results/RAW_NIKON_D1X.dng,src/test/java/resources/temp_images/RAW_NIKON_D1X.NEF.png,src/test/java/resources/temp_images/RAW_NIKON_D1X.dng.png
-

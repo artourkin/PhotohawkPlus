@@ -22,15 +22,19 @@ import ninja.AssetsController;
 import ninja.Router;
 import ninja.application.ApplicationRoutes;
 import controllers.ApplicationController;
+import ninja.utils.NinjaConstant;
 
 public class Routes implements ApplicationRoutes {
 
     @Override
-    public void init(Router router) {  
-        
+    public void init(Router router) {
+        configure();
+
         router.GET().route("/").with(ApplicationController.class, "index");
-        router.GET().route("/hello_world.json").with(ApplicationController.class, "helloWorldJson");
+        router.GET().route("/start").with(InvestigationController.class,"start");
+        router.GET().route("/photohawk").with(InvestigationController.class,"photohawk");
         router.GET().route("/investigate").with(InvestigationController.class,"investigate");
+        router.GET().route("/result").with(InvestigationController.class,"result");
        // router.GET().route("/investigate/{ID}").with(InvestigationController.class,"run");
  
         ///////////////////////////////////////////////////////////////////////
@@ -43,6 +47,11 @@ public class Routes implements ApplicationRoutes {
         // Index / Catchall shows index page
         ///////////////////////////////////////////////////////////////////////
        // router.GET().route("/.*").with(ApplicationController.class, "index");
+    }
+
+
+    private void configure(){
+        System.setProperty(NinjaConstant.MODE_KEY_NAME, NinjaConstant.MODE_DEV);
     }
 
 }
