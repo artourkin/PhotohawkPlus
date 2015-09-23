@@ -1,5 +1,7 @@
 package utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.FmtBool;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.ParseBool;
@@ -19,6 +21,7 @@ import dao.*;
  * Created by artur on 16/09/15.
  */
 public class CSVWriter {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     File file;
     String[] header;
     ICsvBeanWriter beanWriter = null;
@@ -40,32 +43,26 @@ public class CSVWriter {
 
 
 
-    public CSVWriter(File file){
+    public CSVWriter(File file) throws IOException {
         this.file=file;
-        header= new String[] { "SSIM", "isSimilar" ,"Original", "Result", "Original_PNG", "Result_PNG" };
+        header= new String[] { "SSIM", "isSimilar" ,"original", "result", "originalPNG", "resultPNG" };
 
-        try {
             beanWriter = new CsvBeanWriter(new FileWriter(file.getAbsolutePath()),
                     CsvPreference.STANDARD_PREFERENCE);
             beanWriter.writeHeader(header);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
 
     public void write(ImageBean image) throws IOException {
-        System.out.println("Writing a line to CSV");
+        logger.debug("Writing an image to CSV:" + image.toString());
         beanWriter.write(image, header, processors);
     }
 
-    public void destroy(){
+    public void destroy() throws IOException {
 
-        try {
             beanWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
 

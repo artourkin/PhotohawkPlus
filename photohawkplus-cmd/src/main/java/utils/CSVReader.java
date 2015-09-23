@@ -1,5 +1,7 @@
 package utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.constraint.NotNull;
@@ -19,6 +21,7 @@ import dao.*;
  * Created by artur on 20/09/15.
  */
 public class CSVReader {
+    private static final Logger logger = LoggerFactory.getLogger(CSVReader.class);
     private static CellProcessor[] getReadingProcessors() {
 
         return new CellProcessor[] {
@@ -34,27 +37,22 @@ public class CSVReader {
 
 
     public static List<ImageBean> readWithCsvBeanReader(String path) throws Exception {
-        ICsvBeanReader beanReader = null;
+        logger.debug("Reading a CSV from " + path);
         File file=new File(path);
         List<ImageBean> images=new ArrayList<>();
-        try {
-            beanReader = new CsvBeanReader(new FileReader(file), CsvPreference.STANDARD_PREFERENCE);
+        ICsvBeanReader beanReader = new CsvBeanReader(new FileReader(file), CsvPreference.STANDARD_PREFERENCE);
 
-            // the header elements are used to map the values to the bean (names must match)
-            final String[] header = beanReader.getHeader(true);
-            final CellProcessor[] processors = getReadingProcessors();
+        final String[] header = beanReader.getHeader(true);
+        final CellProcessor[] processors = getReadingProcessors();
 
-            ImageBean image;
-            while( (image = beanReader.read(ImageBean.class, header, processors)) != null ) {
-                images.add(image);
-            }
-
+        ImageBean image;
+        while( (image = beanReader.read(ImageBean.class, header, processors)) != null ) {
+            images.add(image);
         }
-        finally {
-            if( beanReader != null ) {
-                beanReader.close();
-            }
+        if( beanReader != null ) {
+            beanReader.close();
         }
+
         return images;
 
     }

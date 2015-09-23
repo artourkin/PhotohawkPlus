@@ -2,6 +2,8 @@ package utils;
 
 
 import org.imgscalr.Scalr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,37 +14,16 @@ import java.io.IOException;
  * Created by artur on 20/09/15.
  */
 public class ImageOps {
-
-    public static String downscale(String original) {
-        String result="";
-        File file = new File(original);
-        String filename=getBaseFilename(file.getName());
-        String tempDir = System.getProperty("java.io.tmpdir");
-        result= tempDir+filename+"_resized.png";
-        downscale(original,result);
-        return result;
-    }
-
-    public static String downscale(String original, String target) {
-
-        BufferedImage tmp = null;
-        try {
-            File file = new File(original);
-            tmp = ImageIO.read(file);
-            tmp = Scalr.resize(tmp, Scalr.Method.AUTOMATIC, 500);
-            ImageIO.write(tmp, "PNG", new File(target));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            assert tmp != null;
-            tmp.flush();
-        }
+    private static final Logger logger = LoggerFactory.getLogger(ImageOps.class);
+    public static String downscale(String original, String target) throws IOException {
+        logger.debug("Downscaling " +original +" to " +target);
+        File fileOriginal = new File(original);
+        File fileTarget = new File(target);
+        BufferedImage tmp = ImageIO.read(fileOriginal);
+        tmp = Scalr.resize(tmp, Scalr.Method.AUTOMATIC, 500);
+        ImageIO.write(tmp, "PNG", fileTarget);
+        tmp.flush();
         return target;
-    }
-
-    static String getBaseFilename(String filepath){
-        return filepath.split("\\.(?=[^\\.]+$)")[0];
     }
 
 }

@@ -4,36 +4,41 @@ package dao;
  * Created by artur on 16/09/15.
  */
 public class ImageBean {
+
+    String original, result, originalPNG, resultPNG;
+    Double SSIM;
+    Boolean isSimilar;
+
     public String getOriginal() {
-        return Original;
+        return original;
     }
 
     public void setOriginal(String original) {
-        Original = original;
+        this.original = original;
     }
 
     public String getResult() {
-        return Result;
+        return result;
     }
 
     public void setResult(String result) {
-        Result = result;
+        this.result = result;
     }
 
-    public String getOriginal_PNG() {
-        return Original_PNG;
+    public String getOriginalPNG() {
+        return originalPNG;
     }
 
-    public void setOriginal_PNG(String original_PNG) {
-        Original_PNG = original_PNG;
+    public void setOriginalPNG(String originalPNG) {
+        this.originalPNG = originalPNG;
     }
 
-    public String getResult_PNG() {
-        return Result_PNG;
+    public String getResultPNG() {
+        return resultPNG;
     }
 
-    public void setResult_PNG(String result_PNG) {
-        Result_PNG = result_PNG;
+    public void setResultPNG(String resultPNG) {
+        this.resultPNG = resultPNG;
     }
 
     public Double getSSIM() {
@@ -43,18 +48,16 @@ public class ImageBean {
     public void setSSIM(Double SSIM) {
         this.SSIM = SSIM;
     }
-    public ImageBean(Double SSIM, Boolean isSimilar,  String Original,String Result,String Original_PNG,String Result_PNG){
+    public ImageBean(Double SSIM, Boolean Is_similar,  String Original,String Result,String Original_PNG,String Result_PNG){
         this.SSIM=SSIM;
-        this.isSimilar= isSimilar;
-        this.Original=Original;
-        this.Result=Result;
-        this.Original_PNG = Original_PNG;
-        this.Result_PNG = Result_PNG;
+        this.isSimilar= Is_similar;
+        this.original =Original;
+        this.result =Result;
+        this.originalPNG = Original_PNG;
+        this.resultPNG = Result_PNG;
     }
     public ImageBean(){}
 
-    String Original, Result, Original_PNG, Result_PNG;
-    Double SSIM;
 
     public Boolean getIsSimilar() {
         return isSimilar;
@@ -64,6 +67,6 @@ public class ImageBean {
         this.isSimilar = isSimilar;
     }
 
-    Boolean isSimilar;
+
 
 }

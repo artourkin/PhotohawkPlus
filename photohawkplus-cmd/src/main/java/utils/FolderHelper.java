@@ -14,4 +14,8 @@ public class FolderHelper {
     public static String getTempPath(){
         return System.getProperty("java.io.tmpdir");
     }
+
+    public static String getBaseFilename(String filepath){
+        return filepath.split("\\.(?=[^\\.]+$)")[0];
+    }
 }
