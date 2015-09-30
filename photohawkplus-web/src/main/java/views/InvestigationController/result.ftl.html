@@ -1,6 +1,24 @@
 <#import "../layout/defaultLayout.ftl.html" as layout> 
 <@layout.myLayout "Investigation">
 
-Success. All the images were examined sucessfully.
+
+
+<#if map?size == 0>
+    Congratulations! The images were successfully examined. No problems with the migration process were found.
+
+    <#else>
+        The images were examined. The following list contains images, which were NOT migrated successfully. Please consider further actions on them. <br><br>
+
+        <ul>
+
+            <#list map as entry>
+                <li> ${entry.getOriginal()}</li>
+            </#list>
+        </ul>
+
+
+
+
+    </#if>
 
 </@layout.myLayout>

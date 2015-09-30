@@ -67,6 +67,10 @@ public class ImageBean {
         this.isSimilar = isSimilar;
     }
 
+    public String toString(){
+        return this.original + " " + this.SSIM.toString();
+    }
+
 
 
 }

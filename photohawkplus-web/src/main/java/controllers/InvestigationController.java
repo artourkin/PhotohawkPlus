@@ -17,8 +17,10 @@ import org.slf4j.LoggerFactory;
 import utils.FolderHelper;
 import utils.ImageOps;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +31,7 @@ import java.util.List;
 public class InvestigationController {
     @Inject
     NinjaProperties ninjaProperties;
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(InvestigationController.class);
     List<ImageBean> images;
     int index;
     String folderOriginalsString, folderResultsString,folderTmp, folderTmpImages;
@@ -44,9 +46,9 @@ public class InvestigationController {
         folderTmp = FolderHelper.getTempPath();
         folderTmpImages=FolderHelper.getTempPath()+File.separator+"temp_photohawk_images";
 
-        logger.debug("A folder with original photos: " + folderOriginalsString);
-        logger.debug("A folder with result photos: " + folderResultsString);
-        logger.debug("A folder to store temporary files: " + folderTmp);
+        logger.info("A folder with original photos: " + folderOriginalsString);
+        logger.info("A folder with result photos: " + folderResultsString);
+        logger.info("A folder to store temporary files: " + folderTmp);
 
         photohawk=new photohawkplusCmd(folderOriginalsString,folderResultsString, folderTmp, folderTmpImages);
         images = photohawk.run();
@@ -56,16 +58,44 @@ public class InvestigationController {
 
     public Result result(){
         cleanAssets();
-        return Results.html();}
+        List<ImageBean> list = run_thresholding();
+
+        //List<Map.Entry<SimplePojo, String>> result  = new ArrayList(map.entrySet());
+        //return Results.html().render("map", result);
+
+        return Results.html().render("map",list);}
+
+    private List<ImageBean> run_thresholding() {
+        ArrayList<ImageBean> result=new ArrayList<>();
+        double threshold=find_minimum_valid(images);
+        for(ImageBean image: images){
+            if (image.getSSIM()<=threshold)
+                result.add(image);
+        }
+        return result;
+    }
+
+    private double find_minimum_valid(List<ImageBean> images) {
+        double result=0.0;
+        for(ImageBean image: images){
+            if (image.getSSIM()>result && !image.getIsSimilar()){
+                result=image.getSSIM();
+            }
+        }
+        return result;
+    }
 
     public Result investigate(Context ctx) {
         Result result=Results.html();
         if (ctx.getParameter("isSimilar")!=null) {
+
             images.get(index).setIsSimilar(Boolean.parseBoolean(ctx.getParameter("isSimilar")));
             index++;
         }
         if (index<images.size()){
+
             ImageBean next=images.get(index);
+            logger.info("Next image and SSIM value: " + next.toString());
             String original_png_downscaled = null;
             String result_png_downscaled = null;
             try {
@@ -90,6 +120,8 @@ public class InvestigationController {
             return Results.redirect("/result");
         }
     }
+
+
 
     String getDownscaledImage(String fileImageString){
         File file;
