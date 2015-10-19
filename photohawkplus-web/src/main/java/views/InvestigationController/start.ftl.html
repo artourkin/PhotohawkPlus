@@ -1,9 +1,80 @@
 <#import "../layout/defaultLayout.ftl.html" as layout>
     <@layout.myLayout "To start">
     <p>Now, photohawk will calculate all the necessary metrics. To start the process, click the button.</p>
-    <form action="/photohawk">
-    <button type="submit">Start</button>
-        </form>
-    <p>Please wait, until the process is finished. You will be redirected automatically.</p>
 
+    <button id="button">Run</button>
+    <button id="buttonStop">Stop</button>
+
+    <style>
+        .glyphicon.spinning {
+            animation: spin 1s infinite linear;
+            -webkit-animation: spin2 1s infinite linear;
+        }
+
+        @keyframes spin {
+            from { transform: scale(1) rotate(0deg); }
+            to { transform: scale(1) rotate(360deg); }
+        }
+
+        @-webkit-keyframes spin2 {
+            from { -webkit-transform: rotate(0deg); }
+            to { -webkit-transform: rotate(360deg); }
+        }
+
+    </style>
+
+    <script type="text/javascript">
+
+
+        $('#button').click(main);
+        $('#buttonStop').click(mainStop);
+        $(document).ready(onReady);
+
+        function onReady(){
+            $('#output').hide();
+        }
+        var xhr=null;
+        function fetch_data(){
+            xhr=$.ajax({
+                type:"GET",
+                url: "/photohawkAsync",
+                async: true,
+                cache: false,
+                dataType: "json",
+                success:registerResults
+            });
+        }
+        function registerResults(data) {
+            if  (data.message=="") {
+                //alert("aborting now");
+                mainStop();
+            }
+            else
+            {
+                $('#ajaxProgress').text(data.message);
+                setTimeout(fetch_data,3000);
+               // alert(data.current);
+            }
+
+
+
+        }
+        function main() {
+            $('#output').fadeIn();
+            fetch_data();
+        }
+        function mainStop() {
+            xhr.abort();
+            window.location.replace("/investigate");
+        }
+
+
+
+    </script>
+
+    <div id="output">
+        <br>
+        <span class="glyphicon glyphicon-refresh spinning"></span>  <text id="ajaxProgress"></text>
+
+    </div>
 </@layout.myLayout>

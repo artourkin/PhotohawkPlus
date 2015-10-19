@@ -64,7 +64,7 @@ public class photohawkplusCmd {
 
 
     }
-    public Double calculateSSIM(String file_string1, String file_string2, String file_string1_png, String file_string2_png) throws IOException {
+    public ImageBean calculateSSIM(String file_string1, String file_string2, String file_string1_png, String file_string2_png) throws IOException {
         logger.debug("Calculating metrics for " + file_string1 + " and " + file_string2);
         File file1 = new File(file_string1);
         File file2 = new File(file_string2);
@@ -73,9 +73,11 @@ public class photohawkplusCmd {
         double SSIM=ssimQa.evaluate(bImage1, bImage2).getResult().getChannelValue(0);
         saveImage(bImage1,file_string1_png);
         saveImage(bImage2,file_string2_png);
+        ImageBean imageBean=new ImageBean(SSIM, true,file_string1,file_string2,file_string1_png, file_string2_png);
         bImage1.flush();
         bImage2.flush();
-        return SSIM;
+
+        return imageBean;
     }
 
     public List<ImageBean> run() {
@@ -127,11 +129,11 @@ public class photohawkplusCmd {
         return file.getAbsolutePath();
     }
 
-    String getBaseFilename(String filepath){
+    public String getBaseFilename(String filepath){
         return filepath.split("\\.(?=[^\\.]+$)")[0];
     }
 
-    List<Path> listFiles(Path path) {
+    public List<Path> listFiles(Path path) {
         List<Path> result=new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path entry : stream) {

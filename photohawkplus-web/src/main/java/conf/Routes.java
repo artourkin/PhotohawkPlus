@@ -30,11 +30,16 @@ public class Routes implements ApplicationRoutes {
     public void init(Router router) {
         configure();
 
+
+
         router.GET().route("/").with(ApplicationController.class, "index");
         router.GET().route("/start").with(InvestigationController.class,"start");
-        router.GET().route("/photohawk").with(InvestigationController.class,"photohawk");
+        router.GET().route("/photohawk").with(InvestigationController.class,"photohawkAsync");
         router.GET().route("/investigate").with(InvestigationController.class,"investigate");
         router.GET().route("/result").with(InvestigationController.class,"result");
+        router.POST().route("/start").with(InvestigationController.class, "photohawkAsync");
+        router.GET().route("/photohawkAsync").with(InvestigationController.class,"photohawkAsync");
+
        // router.GET().route("/investigate/{ID}").with(InvestigationController.class,"run");
  
         ///////////////////////////////////////////////////////////////////////

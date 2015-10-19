@@ -16,6 +16,7 @@
 
 package controllers;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import ninja.*;
 import ninja.params.Param;
 
@@ -41,6 +42,17 @@ public class ApplicationController {
     public Result index() {
 
         return Results.html();
+    }
+
+
+    public Result newBookAjax()
+    {
+        return Results.html();
+    }
+    public Result newBookFormPostAjax(Context context, String book)
+    {
+        System.out.println("Book received: title is " + book);
+        return Results.json().render(book);
     }
 
 
