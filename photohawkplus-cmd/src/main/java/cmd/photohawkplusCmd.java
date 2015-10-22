@@ -3,16 +3,19 @@ package cmd;
 import at.ac.tuwien.photohawk.commandline.util.ImageReader;
 import at.ac.tuwien.photohawk.evaluation.qa.SsimQa;
 import dao.ImageBean;
-
-
+import nl.knaw.dans.fits.FitsWrap;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.CSVWriter;
-import utils.FolderHelper;
+import utils.PhotoConfigurator;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -23,7 +26,7 @@ import java.util.List;
 public class photohawkplusCmd {
     SsimQa ssimQa;
     ImageReader ir;
-    File folderOriginals, folderResults, folderTmp;
+    File folderOriginals, folderResults, folderTmp, folderFits;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     File folderTmpImages;
     CSVWriter csvWriter;
@@ -33,18 +36,22 @@ public class photohawkplusCmd {
             System.out.println("Please specify the following:/path/to/originals /path/to/results /path/to/tmp_results /path/to/tmp_image_results");
             return;
         }
-        photohawkplusCmd m=new photohawkplusCmd(args[0],args[1],args[2], args[3]);
+        //photohawkplusCmd m=new photohawkplusCmd(args[0],args[1],args[2], args[3]);
 
-        if (!m.folderOriginals.isDirectory() || !m.folderResults.isDirectory())
-            return;
-        m.init();
-        m.run();
+       // if (!m.folderOriginals.isDirectory() || !m.folderResults.isDirectory())
+       //     return;
+       // m.init();
+       // m.run();
     }
-    public photohawkplusCmd(String path_to_originals, String path_to_results, String path_to_tmp, String path_to_tmp_images){
+    public photohawkplusCmd(String path_to_originals, String path_to_results, String path_to_tmp, String path_to_tmp_images, String path_to_fits_results){
+        PhotoConfigurator configurator = PhotoConfigurator.getConfigurator();
+        configurator.setProperty("folderOriginals", path_to_originals);
+
+
         folderOriginals =new File(path_to_originals);
         folderResults =new File(path_to_results);
         folderTmp =new File(path_to_tmp);
-
+        folderFits=new File(path_to_fits_results);
         File dirToCreate=new File(path_to_tmp_images);
         try {
             folderTmpImages = Files.createDirectories(dirToCreate.toPath()).toFile();
@@ -151,6 +158,59 @@ public class photohawkplusCmd {
     }
     BufferedImage getBufferedImage(File file) throws IOException {
         return ir.readImage(file, "dcraw", "dcraw");
+
+    }
+
+    public void runFITS(String Originals, String fits_results){
+        FitsWrap fitsWrap=null;
+        try {
+            FitsWrap.setFitsHome("../fits-api/fits-0.8.5");
+            fitsWrap = FitsWrap.instance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<Path> originals = listFiles((new File(Originals)).toPath());
+        int i = 0;
+        int size = originals.size();
+        for (Path original_path : originals) {
+            try {
+                Document document = fitsWrap.extract(original_path.toFile());
+                XMLOutputter xmlOutput = new XMLOutputter();
+                xmlOutput.setFormat(Format.getPrettyFormat());
+                xmlOutput.output(document, new FileWriter(fits_results + File.separator + original_path.getFileName().toString() + ".xml"));
+            }  catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void runFITS(){
+        FitsWrap fitsWrap=null;
+        try {
+            FitsWrap.setFitsHome("../fits-api/fits-0.8.5");
+            fitsWrap = FitsWrap.instance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<Path> originals = listFiles(folderOriginals.toPath());
+        int i = 0;
+        int size = originals.size();
+        for (Path original_path : originals) {
+            try {
+                Document document = fitsWrap.extract(original_path.toFile());
+                XMLOutputter xmlOutput = new XMLOutputter();
+                xmlOutput.setFormat(Format.getPrettyFormat());
+                xmlOutput.output(document, new FileWriter(folderFits.toString() + File.separator + original_path.getFileName().toString() + ".xml"));
+            }  catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }
+
+
+
 
     }
 

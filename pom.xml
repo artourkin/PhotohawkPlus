@@ -10,8 +10,9 @@
     <packaging>pom</packaging>
 
      <modules>
-    <module>photohawkplus-web</module>
-    <module>photohawkplus-cmd</module>
+         <module>fits-api</module>
+         <module>photohawkplus-cmd</module>
+         <module>photohawkplus-web</module>
   </modules>
 
     

@@ -12,8 +12,10 @@ import ninja.utils.NinjaProperties;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.Constants;
 import utils.FolderHelper;
 import utils.ImageOps;
+import utils.PhotoConfigurator;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +38,7 @@ public class InvestigationController {
     private final Logger logger = LoggerFactory.getLogger(InvestigationController.class);
     List<ImageBean> images;
     int index;
-    String folderOriginalsString, folderResultsString, folderTmp, folderTmpImages;
+   // String folderOriginalsString, folderResultsString, folderTmp, folderTmpImages, folderFitsResults;
 
     photohawkplusCmd photohawk;
 
@@ -45,16 +47,25 @@ public class InvestigationController {
     }
 
     public Result photohawk() {
-        folderOriginalsString = ninjaProperties.get("images.original");
-        folderResultsString = ninjaProperties.get("images.result");
-        folderTmp = FolderHelper.getTempPath();
-        folderTmpImages = FolderHelper.getTempPath() + File.separator + "temp_photohawk_images";
+        PhotoConfigurator configurator=PhotoConfigurator.getConfigurator();
+        configurator.setProperty(Constants.PATH_PHOTO_ORIGINALS,ninjaProperties.get("images.original"));
+        configurator.setProperty(Constants.PATH_PHOTO_RESULTS,ninjaProperties.get("images.result"));
+        configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
+        configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
+        configurator.setProperty(Constants.PATH_FITS_RESULTS,ninjaProperties.get("fits.result"));
+       // folderOriginalsString = ninjaProperties.get("images.original");
+       // folderResultsString = ninjaProperties.get("images.result");
+       // folderTmp = FolderHelper.getTempPath();
+        //folderTmpImages = FolderHelper.getTempPath() + File.separator + "temp_photohawk_images";
+        //folderFitsResults=ninjaProperties.get("fits.result");
 
-        logger.info("A folder with original photos: " + folderOriginalsString);
-        logger.info("A folder with result photos: " + folderResultsString);
-        logger.info("A folder to store temporary files: " + folderTmp);
+        logger.info("A folder with original photos: " + configurator.getProperty(Constants.PATH_PHOTO_ORIGINALS));
+        logger.info("A folder with result photos: " + configurator.getProperty(Constants.PATH_PHOTO_RESULTS));
+        logger.info("A folder to store temporary files: " + configurator.getProperty(Constants.PATH_TMP));
+        logger.info("A folder to store FITS results: " + configurator.getProperty(Constants.PATH_FITS_RESULTS));
 
-        photohawk = new photohawkplusCmd(folderOriginalsString, folderResultsString, folderTmp, folderTmpImages);
+
+        photohawk = new photohawkplusCmd();//folderOriginalsString, folderResultsString, folderTmp, folderTmpImages);
         images = photohawk.run();
         index = 0;
 
@@ -302,14 +313,17 @@ public class InvestigationController {
         logger.info("A folder with original photos: " + folderOriginalsString);
         logger.info("A folder with result photos: " + folderResultsString);
         logger.info("A folder to store temporary files: " + folderTmp);
+        logger.info("A folder with fits results: " + folderFitsResults);
 
         isStarted = true;
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 images = new ArrayList<>();
-                photohawkplusCmd photohawk = new photohawkplusCmd(folderOriginalsString, folderResultsString, folderTmp, folderTmpImages);
+                photohawkplusCmd photohawk = new photohawkplusCmd(folderOriginalsString, folderResultsString, folderTmp, folderTmpImages, folderFitsResults);
                 status = "Listing the images.";
+                photohawk.runFITS();
+
                 List<Path> originals = photohawk.listFiles((new File(folderOriginalsString)).toPath());
                 List<Path> results = photohawk.listFiles((new File(folderResultsString)).toPath());
                 int i = 0;

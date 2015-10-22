@@ -73,6 +73,12 @@
         <artifactId>slf4j-api</artifactId>
         <version>1.7.12</version>
     </dependency>
+    <dependency>
+        <groupId>nl.knaw.dans</groupId>
+        <artifactId>fits-api</artifactId>
+        <version>1.0</version>
+    </dependency>
+
 </dependencies>
 
 </project>

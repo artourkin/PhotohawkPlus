@@ -1,5 +1,6 @@
 package utils;
 
+import dao.ImageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.supercsv.cellprocessor.ParseBool;
@@ -14,8 +15,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import dao.*;
 
 /**
  * Created by artur on 20/09/15.

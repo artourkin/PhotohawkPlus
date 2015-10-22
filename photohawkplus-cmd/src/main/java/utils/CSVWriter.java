@@ -1,10 +1,8 @@
 package utils;
 
+import dao.ImageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.supercsv.cellprocessor.FmtBool;
-import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -15,7 +13,6 @@ import org.supercsv.prefs.CsvPreference;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import dao.*;
 
 /**
  * Created by artur on 16/09/15.
