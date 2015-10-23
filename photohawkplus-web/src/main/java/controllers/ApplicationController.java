@@ -26,9 +26,10 @@ import ninja.utils.NinjaMode;
 import ninja.utils.NinjaProperties;
 import ninja.utils.NinjaPropertiesImpl;
 import org.apache.commons.io.FileUtils;
-import utils.CSVReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import utils.*;
 import dao.*;
-import utils.ImageOps;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,9 +40,20 @@ import java.util.List;
 @Singleton
 public class ApplicationController {
 
+
+
+
+
     public Result index() {
 
+        initialize();
+
+
         return Results.html();
+    }
+
+    private void initialize() {
+
     }
 
 

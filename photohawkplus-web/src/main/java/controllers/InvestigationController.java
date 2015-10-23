@@ -38,39 +38,25 @@ public class InvestigationController {
     private final Logger logger = LoggerFactory.getLogger(InvestigationController.class);
     List<ImageBean> images;
     int index;
-   // String folderOriginalsString, folderResultsString, folderTmp, folderTmpImages, folderFitsResults;
-
     photohawkplusCmd photohawk;
-
+    PhotoConfigurator configurator=PhotoConfigurator.getConfigurator();
     public Result start() {
-        return Results.html();
-    }
 
-    public Result photohawk() {
-        PhotoConfigurator configurator=PhotoConfigurator.getConfigurator();
         configurator.setProperty(Constants.PATH_PHOTO_ORIGINALS,ninjaProperties.get("images.original"));
         configurator.setProperty(Constants.PATH_PHOTO_RESULTS,ninjaProperties.get("images.result"));
         configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
         configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
         configurator.setProperty(Constants.PATH_FITS_RESULTS,ninjaProperties.get("fits.result"));
-       // folderOriginalsString = ninjaProperties.get("images.original");
-       // folderResultsString = ninjaProperties.get("images.result");
-       // folderTmp = FolderHelper.getTempPath();
-        //folderTmpImages = FolderHelper.getTempPath() + File.separator + "temp_photohawk_images";
-        //folderFitsResults=ninjaProperties.get("fits.result");
+        configurator.setProperty(Constants.WEB_AJAX_STATUS, "The process started.");
 
         logger.info("A folder with original photos: " + configurator.getProperty(Constants.PATH_PHOTO_ORIGINALS));
         logger.info("A folder with result photos: " + configurator.getProperty(Constants.PATH_PHOTO_RESULTS));
         logger.info("A folder to store temporary files: " + configurator.getProperty(Constants.PATH_TMP));
         logger.info("A folder to store FITS results: " + configurator.getProperty(Constants.PATH_FITS_RESULTS));
-
-
-        photohawk = new photohawkplusCmd();//folderOriginalsString, folderResultsString, folderTmp, folderTmpImages);
-        images = photohawk.run();
-        index = 0;
-
-        return Results.html().render("message", "test");
+        photohawk=new photohawkplusCmd();
+        return Results.html();
     }
+
 
     public static class SimplePOJO {
         public String message;
@@ -78,132 +64,19 @@ public class InvestigationController {
 
 
     public Result photohawkAsync(final Context ctx) {
-
-        if (!isStarted()) {
-            runPhotohawk();
+        if (!photohawk.isStarted()) {
+            images = photohawk.run();
         }
-        logger.info("New async request accepted");
-        //for(Map.Entry<String, List<String>> entry: headers.entrySet()){
-        //    logger.info(entry.getKey()+" : " + entry.getValue());
-        // }
-        //logger.info("context_timeout : " + ctx.getParameter("timeout"));
 
         final SimplePOJO pojo = new SimplePOJO();
-        pojo.message = getStatus();
+        pojo.message = configurator.getProperty(Constants.WEB_AJAX_STATUS);
         logger.info(pojo.message);
         return Results.json().render(pojo);
     }
 
-
-
-
-
-
-
-    /*public Result photohawkAsync_(Context context) {
-        final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        folderOriginalsString = ninjaProperties.get("images.original");
-        folderResultsString = ninjaProperties.get("images.result");
-        folderTmp = FolderHelper.getTempPath();
-        folderTmpImages=FolderHelper.getTempPath()+File.separator+"temp_photohawk_images";
-        final List<ImageBean> imageResults=new ArrayList<>();
-
-        logger.info("A folder with original photos: " + folderOriginalsString);
-        logger.info("A folder with result photos: " + folderResultsString);
-        logger.info("A folder to store temporary files: " + folderTmp);
-
-
-        //json.append("message", "ahahaha");
-        SimplePOJO pojo=new SimplePOJO();
-        pojo.message = "It is a final countdown:";
-
-        for (int i = 0; i < 5; i++) {
-            pojo.message += String.valueOf(i);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            logger.info(pojo.message);
-            context.returnResultAsync(Results.json().render(pojo));
-        }
-
-
-       // return Results.async();
-        // ctx.setAttribute("message", "Processing image: ");
-        // ctx.returnResultAsync(Results.json().render("message Processing image: " ));
-
-
-        photohawk=new photohawkplusCmd(folderOriginalsString,folderResultsString, folderTmp, folderTmpImages);
-        List<Path> originals=photohawk.listFiles((new File(folderOriginalsString)).toPath());
-        List<Path> results = photohawk.listFiles((new File(folderResultsString)).toPath());
-        for (Path original_path: originals){
-            String original_base=photohawk.getBaseFilename(original_path.getFileName().toString());
-            for (Path result_path: results){
-                String result_base=photohawk.getBaseFilename(result_path.getFileName().toString());
-                if (!original_base.isEmpty() && original_base.equals(result_base)){
-                    try {
-                        String original_PNG=(new File(folderTmpImages.toString() + File.separator + original_path.getFileName().toString()+".png")).toString();
-                        String result_PNG=(new File(folderTmpImages.toString() + File.separator + result_path.getFileName().toString()+".png")).toString();
-                        ImageBean image= photohawk.calculateSSIM(original_path.toString(), result_path.toString(), original_PNG, result_PNG);
-                        imageResults.add(image);
-                        logger.info("Processing image: " + original_path.getFileName().toString());
-
-                        //Results.async().json().render("message","test");
-                        // ctx.returnResultAsync(Results.html().render(ctx));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-
-        }
-
-
-//        executorService.schedule(new Runnable() {
-//            @Override
-//            public void run() {
-//                photohawk=new photohawkplusCmd(folderOriginalsString,folderResultsString, folderTmp, folderTmpImages);
-//                List<Path> originals=photohawk.listFiles((new File(folderOriginalsString)).toPath());
-//                List<Path> results = photohawk.listFiles((new File(folderResultsString)).toPath());
-//                for (Path original_path: originals){
-//                    String original_base=photohawk.getBaseFilename(original_path.getFileName().toString());
-//                    for (Path result_path: results){
-//                        String result_base=photohawk.getBaseFilename(result_path.getFileName().toString());
-//                        if (!original_base.isEmpty() && original_base.equals(result_base)){
-//                            try {
-//                                String original_PNG=(new File(folderTmpImages.toString() + File.separator + original_path.getFileName().toString()+".png")).toString();
-//                                String result_PNG=(new File(folderTmpImages.toString() + File.separator + result_path.getFileName().toString()+".png")).toString();
-//                                ImageBean image= photohawk.calculateSSIM(original_path.toString(), result_path.toString(), original_PNG, result_PNG);
-//                                imageResults.add(image);
-//                                ctx.returnResultAsync(Results.json().render("Processing image: " + original_path.getFileName().toString()));
-//                                //ctx.setAttribute("message", "Processing image: " + original_path.getFileName().toString());
-//
-//                                //Results.async().json().render("message","test");
-//                               // ctx.returnResultAsync(Results.html().render(ctx));
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                    }
-//
-//                }
-//
-//            }
-//        }, 30000, TimeUnit.MILLISECONDS);
-        //return Results.json().render("message","testasd");
-    }*/
-
-
     public Result result() {
         cleanAssets();
         List<ImageBean> list = run_thresholding();
-
-        //List<Map.Entry<SimplePojo, String>> result  = new ArrayList(map.entrySet());
-        //return Results.html().render("map", result);
-
         return Results.html().render("map", list);
     }
 
@@ -230,7 +103,6 @@ public class InvestigationController {
     public Result investigate(Context ctx) {
         Result result = Results.html();
         if (ctx.getParameter("isSimilar") != null) {
-
             images.get(index).setIsSimilar(Boolean.parseBoolean(ctx.getParameter("isSimilar")));
             index++;
         }
@@ -240,12 +112,12 @@ public class InvestigationController {
             logger.info("Next image and SSIM value: " + next.toString());
             String original_png_downscaled = null;
             String result_png_downscaled = null;
-            try {
-                original_png_downscaled = ImageOps.downscale(next.getOriginalPNG(), folderTmpImages + File.separator + getDownscaledImage(next.getOriginalPNG()));
-                result_png_downscaled = ImageOps.downscale(next.getResultPNG(), folderTmpImages + File.separator + getDownscaledImage(next.getResultPNG()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+           // try {
+               // original_png_downscaled = ImageOps.downscale(next.getOriginalPNG(), folderTmpImages + File.separator + getDownscaledImage(next.getOriginalPNG()));
+               // result_png_downscaled = ImageOps.downscale(next.getResultPNG(), folderTmpImages + File.separator + getDownscaledImage(next.getResultPNG()));
+          //  } catch (IOException e) {
+          //      e.printStackTrace();
+          //  }
             try {
                 result.render("original", next.getOriginal());
                 result.render("original_png", copyImageToAssets(next.getOriginalPNG()));
@@ -280,47 +152,33 @@ public class InvestigationController {
     void cleanAssets() {
         try {
             FileUtils.cleanDirectory(new File(FolderHelper.getAssetsPath(ninjaProperties.isProd())));
+            FileUtils.cleanDirectory(new File(configurator.getProperty(Constants.PATH_FITS_RESULTS)));
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    private final ScheduledExecutorService executorService = Executors
-            .newSingleThreadScheduledExecutor();
+/*    public void runPhotohawk() {
+        PhotoConfigurator configurator=PhotoConfigurator.getConfigurator();
+        configurator.setProperty(Constants.PATH_PHOTO_ORIGINALS,ninjaProperties.get("images.original"));
+        configurator.setProperty(Constants.PATH_PHOTO_RESULTS,ninjaProperties.get("images.result"));
+        configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
+        configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
+        configurator.setProperty(Constants.PATH_FITS_RESULTS,ninjaProperties.get("fits.result"));
 
-    private String status = "The process started.";
-    private Boolean isStarted = false;
 
-    public String getStatus() {
-        return status;
-    }
-
-    public Boolean isStarted() {
-        return isStarted;
-    }
-
-    public void shutdownExecutor() {
-        isStarted = false;
-    }
-
-    public void runPhotohawk() {
-        folderOriginalsString = ninjaProperties.get("images.original");
-        folderResultsString = ninjaProperties.get("images.result");
-        folderTmp = FolderHelper.getTempPath();
-        folderTmpImages = FolderHelper.getTempPath() + File.separator + "temp_photohawk_images";
-
-        logger.info("A folder with original photos: " + folderOriginalsString);
-        logger.info("A folder with result photos: " + folderResultsString);
-        logger.info("A folder to store temporary files: " + folderTmp);
-        logger.info("A folder with fits results: " + folderFitsResults);
+        logger.info("A folder with original photos: " + configurator.getProperty(Constants.PATH_PHOTO_ORIGINALS));
+        logger.info("A folder with result photos: " + configurator.getProperty(Constants.PATH_PHOTO_RESULTS));
+        logger.info("A folder to store temporary files: " + configurator.getProperty(Constants.PATH_TMP));
+        logger.info("A folder to store FITS results: " + configurator.getProperty(Constants.PATH_FITS_RESULTS));
 
         isStarted = true;
         executorService.execute(new Runnable() {
             @Override
             public void run() {
                 images = new ArrayList<>();
-                photohawkplusCmd photohawk = new photohawkplusCmd(folderOriginalsString, folderResultsString, folderTmp, folderTmpImages, folderFitsResults);
+                photohawkplusCmd photohawk = new photohawkplusCmd();//folderOriginalsString, folderResultsString, folderTmp, folderTmpImages, folderFitsResults);
                 status = "Listing the images.";
                 photohawk.runFITS();
 
@@ -360,7 +218,7 @@ public class InvestigationController {
             }
         });
 
-    }
+    }*/
 
     ;
 

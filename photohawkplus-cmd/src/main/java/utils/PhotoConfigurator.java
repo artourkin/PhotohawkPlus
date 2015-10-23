@@ -2,6 +2,7 @@ package utils;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.NoSuchElementException;
 
 /**
  * Created by artur on 22/10/15.
@@ -18,6 +19,9 @@ public class PhotoConfigurator {
         map.put(key,value);
     }
     public String getProperty(String key){
-        return (String)map.get(key);
+        if (map.containsKey(key))
+            return (String)map.get(key);
+        NoSuchElementException e=new NoSuchElementException("Configurator. No key entry for: "+ key );
+        throw e;
     }
 }
