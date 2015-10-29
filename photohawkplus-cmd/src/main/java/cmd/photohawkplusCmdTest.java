@@ -1,6 +1,7 @@
 package cmd;
 
 import junit.framework.TestCase;
+import wraps.C3POWrap;
 import utils.Constants;
 import utils.FolderHelper;
 import utils.PhotoConfigurator;
@@ -23,7 +24,18 @@ public class photohawkplusCmdTest extends TestCase {
         configurator.setProperty(Constants.PATH_FITS_RESULTS,"/Users/artur/Shared/fits_results");
 
         photohawkplusCmd cmd=new photohawkplusCmd();
-        cmd.runFITS();
+        //cmd.runFITS();
+
+
+        C3POWrap c3poWrap=new C3POWrap("localhost","27017", "c3po", Constants.PATH_FITS_RESULTS);
+       // c3poWrap.uploadFITSmetadata();
+        c3poWrap.getSamples();
 
     }
+
+    public void testRun() throws Exception {
+
+    }
+
+
 }
