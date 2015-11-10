@@ -1,8 +1,11 @@
-package wraps;
+package cmd;
 
+import dao.ImageBean;
 import junit.framework.TestCase;
+import org.apache.cxf.io.CachedOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wraps.C3POWrap;
 import utils.Constants;
 import utils.FolderHelper;
 import utils.PhotoConfigurator;
@@ -11,20 +14,12 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by artur on 28/10/15.
+ * Created by artur on 22/10/15.
  */
-public class C3POWrapTest extends TestCase {
+public class photohawkplusCmdTest extends TestCase {
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     PhotoConfigurator configurator=PhotoConfigurator.getConfigurator();
-    public void testExecute() throws Exception {
-        C3POWrap c3poWrap=new C3POWrap("localhost","27017", "c3po",configurator.getProperty( Constants.PATH_FITS_RESULTS));
-        c3poWrap.execute();
-        List<String> samples = c3poWrap.getSamples();
-        for(String s: samples){
-            System.out.println(s);
-        }
-    }
-
     public void setUp(){
 
         configurator.setProperty(Constants.PATH_PHOTO_ORIGINALS,"/home/artur/rnd/data/originals");
@@ -32,18 +27,28 @@ public class C3POWrapTest extends TestCase {
         configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
         configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
         configurator.setProperty(Constants.PATH_FITS_RESULTS,"/home/artur/rnd/data/fits_results");
-
-      //  FITSWrap fitsWrap=new FITSWrap();
-      //  fitsWrap.execute();
+        configurator.setProperty(Constants.WEB_AJAX_STATUS, "The process started.");
+        //  FITSWrap fitsWrap=new FITSWrap();
+        //  fitsWrap.execute();
 
     }
 
-    public void tearDown(){
 
-        
+    public void testRun() throws Exception {
+        photohawkplusCmd cmd = new photohawkplusCmd();
+        if (!cmd.isBusy()) {
+           // List<ImageBean> run =
+                    cmd.run_serial();
+        }
+        while (cmd.isBusy()){
+            System.out.println(configurator.getProperty(Constants.WEB_AJAX_STATUS));
+            Thread.sleep(1000);
+        }
+
+
+
+
     }
-
-
 
 
 }

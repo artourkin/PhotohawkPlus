@@ -14,16 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.Constants;
 import utils.FolderHelper;
-import utils.ImageOps;
 import utils.PhotoConfigurator;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Created by artur on 21/09/15.
@@ -38,7 +34,7 @@ public class InvestigationController {
     private final Logger logger = LoggerFactory.getLogger(InvestigationController.class);
     List<ImageBean> images;
     int index;
-    photohawkplusCmd photohawk;
+    photohawkplusCmd cmd;
     PhotoConfigurator configurator=PhotoConfigurator.getConfigurator();
     public Result start() {
 
@@ -53,7 +49,7 @@ public class InvestigationController {
         logger.info("A folder with result photos: " + configurator.getProperty(Constants.PATH_PHOTO_RESULTS));
         logger.info("A folder to store temporary files: " + configurator.getProperty(Constants.PATH_TMP));
         logger.info("A folder to store FITS results: " + configurator.getProperty(Constants.PATH_FITS_RESULTS));
-        photohawk=new photohawkplusCmd();
+        cmd =new photohawkplusCmd();
         return Results.html();
     }
 
@@ -64,8 +60,8 @@ public class InvestigationController {
 
 
     public Result photohawkAsync(final Context ctx) {
-        if (!photohawk.isReady()) {
-            images = photohawk.run();
+        if (!cmd.isBusy()) {
+            images = cmd.run_serial();
         }
 
         final SimplePOJO pojo = new SimplePOJO();
@@ -178,25 +174,25 @@ public class InvestigationController {
             @Override
             public void run() {
                 images = new ArrayList<>();
-                photohawkplusCmd photohawk = new photohawkplusCmd();//folderOriginalsString, folderResultsString, folderTmp, folderTmpImages, folderFitsResults);
+                photohawkplusCmd cmd = new photohawkplusCmd();//folderOriginalsString, folderResultsString, folderTmp, folderTmpImages, folderFitsResults);
                 status = "Listing the images.";
-                photohawk.runFITS();
+                cmd.runFITS();
 
-                List<Path> originals = photohawk.listFiles((new File(folderOriginalsString)).toPath());
-                List<Path> results = photohawk.listFiles((new File(folderResultsString)).toPath());
+                List<Path> originals = cmd.listFiles((new File(folderOriginalsString)).toPath());
+                List<Path> results = cmd.listFiles((new File(folderResultsString)).toPath());
                 int i = 0;
                 int size = originals.size();
                 for (Path original_path : originals) {
-                    String original_base = photohawk.getBaseFilename(original_path.getFileName().toString());
+                    String original_base = cmd.getBaseFilename(original_path.getFileName().toString());
                     for (Path result_path : results) {
-                        String result_base = photohawk.getBaseFilename(result_path.getFileName().toString());
+                        String result_base = cmd.getBaseFilename(result_path.getFileName().toString());
                         if (!original_base.isEmpty() && original_base.equals(result_base)) {
                             try {
                                 i++;
                                 status = "Processing an image " + String.valueOf(i) + " of " + String.valueOf(size - 1) + ".";
                                 String original_PNG = (new File(folderTmpImages.toString() + File.separator + original_path.getFileName().toString() + ".png")).toString();
                                 String result_PNG = (new File(folderTmpImages.toString() + File.separator + result_path.getFileName().toString() + ".png")).toString();
-                                ImageBean image = photohawk.calculateSSIM(original_path.toString(), result_path.toString(), original_PNG, result_PNG);
+                                ImageBean image = cmd.calculateSSIM(original_path.toString(), result_path.toString(), original_PNG, result_PNG);
                                 images.add(image);
 
                             } catch (IOException e) {

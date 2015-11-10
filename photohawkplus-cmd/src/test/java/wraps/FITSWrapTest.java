@@ -17,8 +17,8 @@ import java.util.List;
 public class FITSWrapTest extends TestCase {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public void testExecute() throws Exception {
-        PhotoConfigurator.getConfigurator().setProperty(Constants.PATH_FITS_RESULTS, "/Users/artur/Shared/fits_results");
-        PhotoConfigurator.getConfigurator().setProperty(Constants.PATH_PHOTO_ORIGINALS, "/Users/artur/Shared/originals");
+        PhotoConfigurator.getConfigurator().setProperty(Constants.PATH_FITS_RESULTS, "/home/artur/rnd/data/fits_results");
+        PhotoConfigurator.getConfigurator().setProperty(Constants.PATH_PHOTO_ORIGINALS, "/home/artur/rnd/data/originals");
         FITSWrap fitsWrap=new FITSWrap();
         fitsWrap.execute();
 

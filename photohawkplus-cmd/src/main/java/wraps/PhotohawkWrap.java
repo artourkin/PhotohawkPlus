@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,17 +26,17 @@ public class PhotohawkWrap {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
     SsimQa ssimQa;
     ImageReader ir;
-    Boolean isStarted;
     List<ImageBean> images;
     PhotoConfigurator cfg = PhotoConfigurator.getConfigurator();
 
     public PhotohawkWrap() {
         logger.info("Initialising SSIM calculator...");
+        images= new ArrayList<ImageBean>();
         ir = new ImageReader("dcraw.ssim");
         ssimQa = new SsimQa();
         ssimQa.numThreads(4);
         logger.info("Initialization done.");
-        isStarted = true;
+
     }
 
     ImageBean calculateSSIM(String file_string1, String file_string2, String file_string1_png, String file_string2_png) throws IOException {
@@ -84,10 +85,5 @@ public class PhotohawkWrap {
     }
 
 
-    public void shutdownExecutor() {
-        isStarted = false;
-    }
-    public Boolean isStarted(){
-        return isStarted;
-    }
+
 }
