@@ -121,7 +121,7 @@ public class C3POWrap {
     }
 
     public void execute(){
-        //uploadFITSmetadata();
+        uploadFITSmetadata();
         samples = extract_samples();
     }
 

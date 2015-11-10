@@ -52,13 +52,15 @@ public class photohawkplusCmd {
         executorService.execute(new Runnable() {
             @Override
             public void run() {
+                photohawkWrap = new PhotohawkWrap();
                 fitsWrap = new FITSWrap();
                 c3poWrap = new C3POWrap("localhost", "27017", "c3po", Constants.PATH_FITS_RESULTS);
-                photohawkWrap = new PhotohawkWrap();
                 images = new ArrayList<>();
+
                 fitsWrap.execute();
                 c3poWrap.execute();
                 photohawkWrap.execute();
+
                 cfg.setProperty(Constants.WEB_AJAX_STATUS, "");
                 try {
                     Thread.sleep(10000);

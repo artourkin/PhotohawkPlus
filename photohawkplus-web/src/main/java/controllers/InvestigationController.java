@@ -64,7 +64,7 @@ public class InvestigationController {
 
 
     public Result photohawkAsync(final Context ctx) {
-        if (!photohawk.isStarted()) {
+        if (!photohawk.isReady()) {
             images = photohawk.run();
         }
 
