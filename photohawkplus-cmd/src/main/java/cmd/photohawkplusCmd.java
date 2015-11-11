@@ -36,7 +36,6 @@ public class photohawkplusCmd {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public static void main(String[] args) {
@@ -46,21 +45,25 @@ public class photohawkplusCmd {
         }
     }
 
+    public List<ImageBean> getImages(){
+        if (photohawkWrap!=null)
+            return photohawkWrap.getImages();
+        return new ArrayList<ImageBean>();
+    }
 
-
-    public List<ImageBean> run() {
+    public void run() {
 
         isBusy = true;
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                photohawkWrap = new PhotohawkWrap();
-                fitsWrap = new FITSWrap();
-                c3poWrap = new C3POWrap("localhost", "27017", "c3po", cfg.getProperty( Constants.PATH_FITS_RESULTS));
                 images = new ArrayList<>();
-
+                fitsWrap = new FITSWrap();
                 fitsWrap.execute();
+                cfg.setProperty(Constants.WEB_AJAX_STATUS, cfg.getProperty( Constants.PATH_FITS_RESULTS));
+                c3poWrap = new C3POWrap("localhost", "27017", "c3po", cfg.getProperty( Constants.PATH_FITS_RESULTS));
                 c3poWrap.execute();
+                photohawkWrap = new PhotohawkWrap();
                 photohawkWrap.execute();
 
                 cfg.setProperty(Constants.WEB_AJAX_STATUS, "");
@@ -71,20 +74,19 @@ public class photohawkplusCmd {
                 }
                 shutdownExecutor();
             }
-
-
         });
-        return images;
     }
 
-    public List<ImageBean> run_serial() {
+    public void run_serial() {
         isBusy = true;
         photohawkWrap = new PhotohawkWrap();
         fitsWrap = new FITSWrap();
         c3poWrap = new C3POWrap("localhost", "27017", "c3po", cfg.getProperty( Constants.PATH_FITS_RESULTS));
+        c3poWrap.execute();
+
         images = new ArrayList<>();
 
-        fitsWrap.execute();
+        //fitsWrap.execute();
         c3poWrap.execute();
         List<String> samples = c3poWrap.getSamples();
         photohawkWrap.execute();
@@ -96,7 +98,6 @@ public class photohawkplusCmd {
             e.printStackTrace();
         }
         shutdownExecutor();
-        return images;
     }
 
 

@@ -26,7 +26,7 @@ public class FITSWrap {
     PhotoConfigurator cfg = PhotoConfigurator.getConfigurator();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public FITSWrap(){
-        FitsWrap.setFitsHome("../fits-api/fits-0.8.5");
+        FitsWrap.setFitsHome(cfg.getProperty(Constants.PATH_FITS_HOME));//"../fits-api/fits-0.8.5");
         try {
             fitsWrap = FitsWrap.instance();
         } catch (Exception e) {

@@ -28,7 +28,6 @@ import java.util.List;
 @Singleton
 public class InvestigationController {
 
-
     @Inject
     NinjaProperties ninjaProperties;
     private final Logger logger = LoggerFactory.getLogger(InvestigationController.class);
@@ -43,6 +42,7 @@ public class InvestigationController {
         configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
         configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
         configurator.setProperty(Constants.PATH_FITS_RESULTS,ninjaProperties.get("fits.result"));
+        configurator.setProperty(Constants.PATH_FITS_HOME,ninjaProperties.get("fits.home"));
         configurator.setProperty(Constants.WEB_AJAX_STATUS, "The process started.");
 
         logger.info("A folder with original photos: " + configurator.getProperty(Constants.PATH_PHOTO_ORIGINALS));
@@ -53,17 +53,14 @@ public class InvestigationController {
         return Results.html();
     }
 
-
     public static class SimplePOJO {
         public String message;
     }
 
-
     public Result photohawkAsync(final Context ctx) {
         if (!cmd.isBusy()) {
-            images = cmd.run_serial();
+            cmd.run();
         }
-
         final SimplePOJO pojo = new SimplePOJO();
         pojo.message = configurator.getProperty(Constants.WEB_AJAX_STATUS);
         logger.info(pojo.message);

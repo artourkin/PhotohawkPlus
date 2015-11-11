@@ -11,6 +11,7 @@ public class Constants {
     public static String PATH_TMP="path.tmp";
     public static String PATH_FITS_RESULTS="path.fits.results";
     public static String WEB_AJAX_STATUS="web.ajax.status";
+    public static String PATH_FITS_HOME="path.fits.home";
 
 
 }

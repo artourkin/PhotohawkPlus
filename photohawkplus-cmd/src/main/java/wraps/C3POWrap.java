@@ -39,7 +39,7 @@ public class C3POWrap {
     Map<String, Class<? extends ProcessingRule>> knownRules;
     Map<String, Class<? extends AbstractAdaptor>> knownAdaptors;
     public C3POWrap(String host, String port, String dbname, String path_to_fits_results) {
-
+        cfg.setProperty(Constants.WEB_AJAX_STATUS, "Configuring c3po.");
         Configurator.getDefaultConfigurator().configure();
 
         pLayer = new MongoPersistenceLayer();
@@ -74,7 +74,7 @@ public class C3POWrap {
         knownRules.put(com.petpet.c3po.common.Constants.CNF_CONTENT_TYPE_IDENTIFICATION_RULE, ContentTypeIdentificationRule.class);
         knownRules.put(com.petpet.c3po.common.Constants.CNF_FILE_EXTENSION_IDENTIFICATION_RULE, FileExtensionIdentificationRule.class);
 
-
+        cfg.setProperty(Constants.WEB_AJAX_STATUS, "Done.");
 
     }
 
@@ -121,8 +121,12 @@ public class C3POWrap {
     }
 
     public void execute(){
+        logger.debug("Putting data into mongodb");
         uploadFITSmetadata();
+        logger.debug("Exctracting samples");
         samples = extract_samples();
+        logger.info(samples.size() + " samples were extracted.");
+        cfg.setProperty(Constants.WEB_AJAX_STATUS, samples.size() + " samples were extracted.");
     }
 
     public List<String> getSamples(){

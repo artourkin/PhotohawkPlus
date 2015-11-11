@@ -70,7 +70,7 @@ public class PhotohawkWrap {
                 if (!original_base.isEmpty() && original_base.equals(result_base)) {
                     try {
                         i++;
-                        cfg.setProperty(Constants.WEB_AJAX_STATUS, "Processing an image " + String.valueOf(i) + " of " + String.valueOf(size - 1) + ".");
+                        cfg.setProperty(Constants.WEB_AJAX_STATUS, "Calculating similarity metrics for an image " + String.valueOf(i) + " of " + String.valueOf(size) + ".");
                         String original_PNG = (new File(cfg.getProperty(Constants.PATH_TMP_PHOTO) + File.separator + original_path.getFileName().toString() + ".png")).toString();
                         String result_PNG = (new File(cfg.getProperty(Constants.PATH_TMP_PHOTO) + File.separator + result_path.getFileName().toString() + ".png")).toString();
                         ImageBean image = calculateSSIM(original_path.toString(), result_path.toString(), original_PNG, result_PNG);

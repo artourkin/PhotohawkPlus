@@ -28,17 +28,13 @@ public class photohawkplusCmdTest extends TestCase {
         configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
         configurator.setProperty(Constants.PATH_FITS_RESULTS,"/home/artur/rnd/data/fits_results");
         configurator.setProperty(Constants.WEB_AJAX_STATUS, "The process started.");
-        //  FITSWrap fitsWrap=new FITSWrap();
-        //  fitsWrap.execute();
-
     }
 
 
     public void testRun() throws Exception {
         photohawkplusCmd cmd = new photohawkplusCmd();
         if (!cmd.isBusy()) {
-           // List<ImageBean> run =
-                    cmd.run_serial();
+            cmd.run();
         }
         while (cmd.isBusy()){
             System.out.println(configurator.getProperty(Constants.WEB_AJAX_STATUS));

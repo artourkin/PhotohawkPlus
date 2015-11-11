@@ -32,7 +32,7 @@ public class C3POWrapTest extends TestCase {
         configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
         configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
         configurator.setProperty(Constants.PATH_FITS_RESULTS,"/home/artur/rnd/data/fits_results");
-
+        configurator.setProperty(Constants.PATH_FITS_HOME,"/home/artur/rnd/git/photohawkplus/fits-api/fits-0.8.5");
       //  FITSWrap fitsWrap=new FITSWrap();
       //  fitsWrap.execute();
 
