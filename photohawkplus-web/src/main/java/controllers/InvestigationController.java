@@ -41,8 +41,11 @@ public class InvestigationController {
         configurator.setProperty(Constants.PATH_PHOTO_RESULTS,ninjaProperties.get("images.result"));
         configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
         configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
-        configurator.setProperty(Constants.PATH_FITS_RESULTS,ninjaProperties.get("fits.result"));
-        configurator.setProperty(Constants.PATH_FITS_HOME,ninjaProperties.get("fits.home"));
+        configurator.setProperty(Constants.PATH_FITS_RESULTS,FolderHelper.getTempPath() + File.separator + "temp_fits_results");
+        configurator.setProperty(Constants.PATH_FITS_HOME,"../fits-api/fits-0.8.5");
+
+       // configurator.setProperty(Constants.PATH_FITS_RESULTS,ninjaProperties.get("fits.result"));
+      //  configurator.setProperty(Constants.PATH_FITS_HOME,ninjaProperties.get("fits.home"));
         configurator.setProperty(Constants.WEB_AJAX_STATUS, "The process started.");
 
         logger.info("A folder with original photos: " + configurator.getProperty(Constants.PATH_PHOTO_ORIGINALS));
