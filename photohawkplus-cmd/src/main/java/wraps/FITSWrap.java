@@ -26,7 +26,7 @@ public class FITSWrap {
     PhotoConfigurator cfg = PhotoConfigurator.getConfigurator();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public FITSWrap(){
-        FitsWrap.setFitsHome(cfg.getProperty(Constants.PATH_FITS_HOME));//"../fits-api/fits-0.8.5");
+        FitsWrap.setFitsHome("../fits-api/fits-0.8.5");
         try {
             fitsWrap = FitsWrap.instance();
         } catch (Exception e) {
@@ -46,7 +46,9 @@ public class FITSWrap {
                 Document document = fitsWrap.extract(original_path.toFile());
                 XMLOutputter xmlOutput = new XMLOutputter();
                 xmlOutput.setFormat(Format.getPrettyFormat());
-                xmlOutput.output(document, new FileWriter(fits_results + File.separator + original_path.getFileName().toString() + ".xml"));
+                File newFile=new File(fits_results + File.separator + original_path.getFileName().toString() + ".xml");
+                newFile.createNewFile();
+                xmlOutput.output(document, new FileWriter(newFile));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -56,7 +58,10 @@ public class FITSWrap {
     void cleanOutputFolder(){
 
         try {
-            FileUtils.cleanDirectory(new File(cfg.getProperty(Constants.PATH_FITS_RESULTS)));
+            File file= new File(cfg.getProperty(Constants.PATH_FITS_RESULTS));
+            if (file.isFile() && file.isDirectory())
+                FileUtils.cleanDirectory(new File(cfg.getProperty(Constants.PATH_FITS_RESULTS)));
+            file.mkdirs();
         } catch (IOException e) {
             logger.info("Could not clean the FITS results folder");
         }

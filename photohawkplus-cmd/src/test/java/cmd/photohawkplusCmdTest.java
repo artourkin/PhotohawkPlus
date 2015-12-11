@@ -22,12 +22,12 @@ public class photohawkplusCmdTest extends TestCase {
     PhotoConfigurator configurator=PhotoConfigurator.getConfigurator();
     public void setUp(){
 
-        configurator.setProperty(Constants.PATH_PHOTO_ORIGINALS,"/home/artur/rnd/data/originals");
-        configurator.setProperty(Constants.PATH_PHOTO_RESULTS,"/home/artur/rnd/data/results");
+        configurator.setProperty(Constants.PATH_PHOTO_ORIGINALS,"src/test/resources/photos/originals");
+        configurator.setProperty(Constants.PATH_PHOTO_RESULTS,"src/test/resources/photos/results");
         configurator.setProperty(Constants.PATH_TMP, FolderHelper.getTempPath());
         configurator.setProperty(Constants.PATH_TMP_PHOTO,FolderHelper.getTempPath() + File.separator + "temp_photohawk_images");
-        configurator.setProperty(Constants.PATH_FITS_RESULTS,"/home/artur/rnd/data/fits_results");
-        configurator.setProperty(Constants.WEB_AJAX_STATUS, "The process started.");
+        configurator.setProperty(Constants.PATH_FITS_RESULTS,FolderHelper.getTempPath() + File.separator + "temp_fits_results");
+        configurator.setProperty(Constants.PATH_FITS_HOME,"../fits-api/fits-0.8.5");
     }
 
 
