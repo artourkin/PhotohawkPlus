@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.Constants;
 import utils.FolderHelper;
+import utils.ImageOps;
 import utils.PhotoConfigurator;
 
 import java.io.File;
@@ -78,8 +79,8 @@ public class InvestigationController {
 
     private List<ImageBean> run_thresholding() {
         ArrayList<ImageBean> result = new ArrayList<>();
-        double threshold = find_minimum_valid(images);
-        for (ImageBean image : images) {
+        double threshold = find_minimum_valid(cmd.getImages());
+        for (ImageBean image : cmd.getImages()) {
             if (image.getSSIM() <= threshold)
                 result.add(image);
         }
@@ -99,21 +100,21 @@ public class InvestigationController {
     public Result investigate(Context ctx) {
         Result result = Results.html();
         if (ctx.getParameter("isSimilar") != null) {
-            images.get(index).setIsSimilar(Boolean.parseBoolean(ctx.getParameter("isSimilar")));
+            cmd.getImages().get(index).setIsSimilar(Boolean.parseBoolean(ctx.getParameter("isSimilar")));
             index++;
         }
-        if (index < images.size()) {
+        if (index < cmd.getImages().size()) {
 
-            ImageBean next = images.get(index);
+            ImageBean next = cmd.getImages().get(index);
             logger.info("Next image and SSIM value: " + next.toString());
             String original_png_downscaled = null;
             String result_png_downscaled = null;
-           // try {
-               // original_png_downscaled = ImageOps.downscale(next.getOriginalPNG(), folderTmpImages + File.separator + getDownscaledImage(next.getOriginalPNG()));
-               // result_png_downscaled = ImageOps.downscale(next.getResultPNG(), folderTmpImages + File.separator + getDownscaledImage(next.getResultPNG()));
-          //  } catch (IOException e) {
-          //      e.printStackTrace();
-          //  }
+            try {
+                original_png_downscaled = ImageOps.downscale(next.getOriginalPNG(),  configurator.getProperty(Constants.PATH_TMP) + File.separator + getDownscaledImage(next.getOriginalPNG()));
+                result_png_downscaled = ImageOps.downscale(next.getResultPNG(),  configurator.getProperty(Constants.PATH_TMP) + File.separator + getDownscaledImage(next.getResultPNG()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             try {
                 result.render("original", next.getOriginal());
                 result.render("original_png", copyImageToAssets(next.getOriginalPNG()));
@@ -215,8 +216,6 @@ public class InvestigationController {
         });
 
     }*/
-
-    ;
 
 
 }
