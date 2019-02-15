@@ -50,6 +50,10 @@ public class photohawkplusCmd {
             return photohawkWrap.getImages();
         return new ArrayList<ImageBean>();
     }
+   // public List<ImageBean> getSamples(){
+        //if (c3poWrap!=null)
+           // return c3poWrap.getSamples();
+   // }
 
     public void run() {
 

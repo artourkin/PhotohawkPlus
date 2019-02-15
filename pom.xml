@@ -13,7 +13,8 @@
          <module>fits-api</module>
          <module>photohawkplus-cmd</module>
          <module>photohawkplus-web</module>
-  </modules>
+         <module>photohawkplus-gui</module>
+     </modules>
 
     
 
